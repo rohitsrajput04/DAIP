@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:daip_test;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+jwt:
+  secret: test-secret-key-for-unit-tests-min-32-chars
+  expiration-ms: 3600000
+
+daip:
+  upload:
+    dir: ./target/test-uploads
+  rag:
+    chunk-size: 200
+    chunk-overlap: 20
+    top-k: 3
+    min-similarity: 0.1
+    embedding-model: text-embedding-3-small
+    embedding-dimensions: 1536
+    chat-model: gpt-4o-mini
+
+cors:
+  allowed-origins: http://localhost:3000

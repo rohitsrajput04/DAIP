@@ -1,0 +1,55 @@
+DAIP is an AI-powered enterprise knowledge assistant that enables employees to securely search, understand, and interact with internal banking documents using Generative AI and Retrieval-Augmented Generation (RAG). Instead of manually searching through documents, users ask questions in natural language and receive accurate, context-aware answers with references to the original documents.
+
+What it does
+Uploads internal documents (PDF, Word, Excel, text).
+Parses and chunks document content.
+Generates vector embeddings for semantic search.
+Stores vectors in PostgreSQL using pgvector.
+Stores document metadata in MongoDB/PostgreSQL.
+Performs hybrid search (semantic + keyword).
+Retrieves the most relevant document chunks.
+Uses an LLM to generate grounded answers.
+Returns citations and document sources.
+Supports domain-based filtering (HR, Compliance, Legal, Payments, ESG, etc.).
+Maintains secure authentication using JWT.
+Technology Stack
+Backend: Java, Spring Boot
+Database: PostgreSQL + pgvector
+Metadata: MongoDB/PostgreSQL
+AI: OpenAI/Ollama embedding model + LLM
+Search: Hybrid Semantic + Keyword Search
+Frontend: React
+Security: Spring Security + JWT
+Deployment: Docker, Kubernetes, GCP
+Architecture Flow
+User
+   │
+   ▼
+React UI
+   │
+   ▼
+Spring Boot REST API
+   │
+   ▼
+RAG Pipeline
+   │
+   ├── Embed Query
+   ├── Semantic Search (pgvector)
+   ├── Keyword Search
+   ├── Merge Results
+   ├── Build Context
+   ▼
+LLM
+   │
+   ▼
+AI Response + Source Citations
+Business Benefits
+Reduces document search time from minutes to seconds.
+Provides trustworthy AI answers grounded in enterprise documents.
+Minimizes hallucinations through RAG.
+Improves employee productivity.
+Protects sensitive banking information by using internal knowledge only.
+Can be extended for compliance, risk, ESG, legal, operations, and customer support use cases.
+One-line Elevator Pitch
+
+DAIP is an enterprise AI knowledge platform that combines RAG, semantic search, and Large Language Models to deliver fast, accurate, and secure answers from Deutsche Bank's internal documents.

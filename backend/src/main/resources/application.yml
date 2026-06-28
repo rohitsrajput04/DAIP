@@ -1,0 +1,68 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://ep-noisy-waterfall-athvo97l.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_U0SQBo5mENrL
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# JWT configuration
+jwt:
+  secret: ${JWT_SECRET:daip-dev-secret-key-change-in-production-32chars}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+# File upload storage
+daip:
+  upload:
+    dir: ${UPLOAD_DIR:./uploads}
+  rag:
+    chunk-size: ${RAG_CHUNK_SIZE:800}
+    chunk-overlap: ${RAG_CHUNK_OVERLAP:100}
+    top-k: ${RAG_TOP_K:5}
+    min-similarity: ${RAG_MIN_SIMILARITY:0.3}
+    embedding-model: ${RAG_EMBEDDING_MODEL:text-embedding-3-small}
+    embedding-dimensions: ${RAG_EMBEDDING_DIMENSIONS:1536}
+    chat-model: ${RAG_CHAT_MODEL:gpt-4o-mini}
+
+# OpenAI (Phase 2+)
+openai:
+  api-key: ${OPENAI_API_KEY:}
+
+# CORS
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+
+# Swagger / OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.db.daip: INFO
+    org.springframework.security: WARN
