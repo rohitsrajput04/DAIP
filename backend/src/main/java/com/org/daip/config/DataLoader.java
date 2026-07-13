@@ -36,9 +36,9 @@ public class DataLoader {
 
             userRepository.save(User.builder()
                     .username("analyst")
-                    .email("analyst@daip.db.com")
+                    .email("analyst@daip.com")
                     .password(passwordEncoder.encode("analyst123"))
-                    .fullName("Sarah Mueller")
+                    .fullName("Analyst  Test")
                     .department("Risk Analytics")
                     .role(UserRole.ANALYST)
                     .enabled(true)
@@ -46,9 +46,9 @@ public class DataLoader {
 
             userRepository.save(User.builder()
                     .username("compliance")
-                    .email("compliance@daip.db.com")
+                    .email("compliance@daip.com")
                     .password(passwordEncoder.encode("compliance123"))
-                    .fullName("James Chen")
+                    .fullName("Complaiance Test")
                     .department("Compliance")
                     .role(UserRole.COMPLIANCE_OFFICER)
                     .enabled(true)

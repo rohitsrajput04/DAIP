@@ -65,4 +65,16 @@ export const userApi = {
   getMe: () => api.get('/users/me'),
 };
 
+export const speechApi = {
+  speechToText: (audioFile) => {
+    const formData = new FormData();
+    formData.append('audio', audioFile);
+    return api.post('/speech/stt', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  textToSpeech: (text) => api.post('/speech/tts', { text }),
+  getVoices: () => api.get('/speech/voices'),
+};
+
 export default api;

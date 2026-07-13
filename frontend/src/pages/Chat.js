@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, Form, Button, Spinner, Badge } from 'react-bootstrap';
+import { Card, Form, Button, Spinner, Badge, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { chatApi } from '../services/api';
+import SpeechButton from '../components/SpeechButton';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
@@ -8,6 +9,7 @@ function Chat() {
   const [sessionId, setSessionId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [domainCode, setDomainCode] = useState('CORE');
+  const [autoSpeak, setAutoSpeak] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -28,11 +30,16 @@ function Chat() {
       const { data } = await chatApi.send(input, sessionId, domainCode);
       console.log('Chat response received:', data);
       setSessionId(data.id);
-      setMessages(data.messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-        createdAt: m.createdAt,
-      })));
+      
+      // Append the assistant's response to existing messages instead of replacing all
+      const assistantMsg = data.messages.find(m => m.role === 'ASSISTANT');
+      if (assistantMsg) {
+        setMessages((prev) => [...prev, {
+          role: assistantMsg.role,
+          content: assistantMsg.content,
+          createdAt: assistantMsg.createdAt,
+        }]);
+      }
     } catch (err) {
       console.error('Chat error:', err);
       console.error('Error response:', err.response);
@@ -46,6 +53,19 @@ function Chat() {
     }
   };
 
+  const handleTranscript = (transcript) => {
+    setInput(transcript);
+  };
+
+  const handleSpeak = (text) => {
+    if (autoSpeak && text) {
+      // Text-to-speech is handled by the SpeechButton component
+    }
+  };
+
+  // Get the last assistant message for text-to-speech
+  const lastAssistantMessage = messages.filter(m => m.role === 'ASSISTANT').pop();
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -53,17 +73,28 @@ function Chat() {
           <h2 className="mb-1">AI Chat</h2>
           <p className="text-muted mb-0">DB AI Decision Intelligence Platform (DAIP)</p>
         </div>
-        <Form.Select
-          style={{ width: 200 }}
-          value={domainCode}
-          onChange={(e) => setDomainCode(e.target.value)}
-        >
-          <option value="CORE">Core</option>
-          <option value="RISK">Risk</option>
-          <option value="COMPLIANCE">Compliance</option>
-          <option value="ESG">ESG</option>
-          <option value="AML">AML</option>
-        </Form.Select>
+        <div className="d-flex align-items-center gap-3">
+          <ToggleButtonGroup
+            type="checkbox"
+            value={[autoSpeak ? 'speak' : '']}
+            onChange={(val) => setAutoSpeak(val.includes('speak'))}
+          >
+            <ToggleButton id="tbg-speak" value="speak" variant={autoSpeak ? 'success' : 'outline-success'} size="sm">
+              🔊 Auto-speak
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <Form.Select
+            style={{ width: 200 }}
+            value={domainCode}
+            onChange={(e) => setDomainCode(e.target.value)}
+          >
+            <option value="CORE">Core</option>
+            <option value="RISK">Risk</option>
+            <option value="COMPLIANCE">Compliance</option>
+            <option value="ESG">ESG</option>
+            <option value="AML">AML</option>
+          </Form.Select>
+        </div>
       </div>
 
       <Card className="stat-card">
@@ -74,6 +105,9 @@ function Chat() {
                 <div className="fs-1 mb-3">🤖</div>
                 <p>Ask about risk, compliance, documents, or platform capabilities.</p>
                 <Badge bg="info">Domain: {domainCode}</Badge>
+                <p className="mt-2">
+                  <small>Use 🎤 to speak your message or 🔊 to hear responses</small>
+                </p>
               </div>
             )}
             {messages.map((msg, idx) => (
@@ -81,7 +115,17 @@ function Chat() {
                 key={idx}
                 className={`chat-bubble ${msg.role === 'USER' ? 'user' : 'assistant'}`}
               >
-                {msg.content}
+                <div className="message-content">{msg.content}</div>
+                {msg.role === 'ASSISTANT' && (
+                  <div className="mt-1">
+                    <SpeechButton
+                      mode="output"
+                      textToSpeak={msg.content}
+                      onSpeak={autoSpeak}
+                      size="sm"
+                    />
+                  </div>
+                )}
               </div>
             ))}
             {loading && (
@@ -93,12 +137,19 @@ function Chat() {
           </div>
 
           <Form onSubmit={handleSend} className="mt-3 d-flex gap-2">
-            <Form.Control
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
-              disabled={loading}
-            />
+            <div className="flex-grow-1 d-flex gap-2">
+              <Form.Control
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your message..."
+                disabled={loading}
+              />
+              <SpeechButton
+                mode="input"
+                onTranscript={handleTranscript}
+                disabled={loading}
+              />
+            </div>
             <Button
               type="submit"
               disabled={loading || !input.trim()}
